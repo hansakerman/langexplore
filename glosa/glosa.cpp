@@ -1,20 +1,31 @@
 #include <iostream>
 #include <fstream>
+#include <map>
 using namespace std;
 
 int main(){
-
+  string userInput;
+  map<string,string> words;
+  
   ofstream MyFile("file.txt");
-  //MyFile << "Now I write the the file object. Hurray!"<<std::endl<<"foo";
-  //MyFile.close();
-  //
   string myText;
   ifstream MyReadFile("words.txt");
 
-  while (std::getline (MyReadFile, myText)) {
-    cout << "FOO";
-    cout << myText;
+  while (getline (MyReadFile, myText)) {
+    words.insert({myText.substr(0,myText.find(" ")),myText});
   }
 
+  for (auto const& [key, val] : words)
+    {
+      cout << key        // string (key)
+	   << ':'  
+	   << val        // string's value
+	   << std::endl;
+    }
+  
+  cout <<  words.size()<< endl;
+  cout << "Svara: ";
+	  cin >> userInput;
+  cout << userInput;
   MyReadFile.close();
 }
