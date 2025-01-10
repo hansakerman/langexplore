@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <string>
 using namespace std;
 
 int main(){
@@ -12,15 +13,21 @@ int main(){
   ifstream MyReadFile("words.txt");
 
   while (getline (MyReadFile, myText)) {
-    words.insert({myText.substr(0,myText.find(" ")),myText});
+    int pos=myText.find(" "); // We have to cut out the first glossary word.
+    words.insert({myText.substr(0,pos),myText.substr(pos+1)});
   }
 
-  for (auto const& [key, val] : words)
+  string answer;
+
+  for (auto const& [word, definition] : words)
     {
-      cout << key        // string (key)
-	   << ':'  
-	   << val        // string's value
-	   << std::endl;
+      
+      cout << word<<endl;
+      cout << "Svar: ";
+      cin >> answer;
+      cout << definition << endl;
+      if (definition.find(answer)!=string::npos){cout << "korrekt"<<endl;}
+      else {cout << "NOPE"<<endl;}
     }
   
   cout <<  words.size()<< endl;
