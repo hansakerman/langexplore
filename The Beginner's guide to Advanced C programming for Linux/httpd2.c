@@ -77,8 +77,9 @@ int cli_accept(int s)
 
 void cli_conn(int s, int c)
 {
-    // Handle the client connection here
-    close(c); // Close the client socket after handling
+  return;
+  // Handle the client connection here
+    //close(c); // Close the client socket after handling
 }
 
 // argc = argument count, argv = argument vector
