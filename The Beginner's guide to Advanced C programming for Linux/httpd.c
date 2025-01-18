@@ -117,8 +117,7 @@ int main(int argc, char *argv[])
       if (!fork())
 	cli_conn(s, c);
 
-  
-    }
+      }
 
   
   return -2;
