@@ -1,3 +1,5 @@
+29:20!!
+
 /* httpd.c */
 
 #include<netinet/in.h>
@@ -14,6 +16,13 @@
 // just localhost
 #define LISTENADDR "127.0.0.1"
 
+/* structures */
+struct sHttpRequest {
+  char method[8]; // "verb" example GET
+  car url[128];
+};
+typedef struct sHttpRequest httpreq;
+  
 /* global */
 char *error;
 
@@ -75,6 +84,27 @@ int cli_accept(int s)
   return c;
 }
 
+/* returns 0 on error, or it returns a httpreq structure */
+
+httpreq *parse_http(char *str)
+{
+  httpreq *req;
+  char *p;
+  
+  reg = malloc(sizeof(httpreq));
+  memset(&req, 0, sizeof(httpreq));
+
+  for (p=str; p && *p != ' '; p++);
+  if (*p == ' ')
+  *p = 0;
+  else
+    {
+      error = "parse_http() NOSPACE error";
+      free(req);
+      return 0;
+    }
+
+  // 29:20
 void cli_conn(int s, int c){
   return;
 }
@@ -84,7 +114,24 @@ int main(int argc, char *argv[])
 {
   int s, c;
   char *port;
+  char *template;
+  httpreg *req;
+  
+  template =
+    "GET /fileboar HTTP/1.1\n"
+    "Host: 127.0.0.1:8181\n"
+    "User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:134.0) Gecko/20100101 Firefox/134.0\n"
+    "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\n"
+    "Accept-Language: en-US,en;q=0.5\n"
+    "Accept-Encoding: gzip, deflate, br, zstd\n"
+    "Connection: keep-alive\n"
+    "\n";
 
+   n = strlen(template);
+  reg = parse_http(template);
+  printf("Method: '%s'\nURL: '%s'\n",
+	 req->method, req-url);
+  
   if (argc < 2)
     {
       fprintf(stderr, "ERROR: Usage: %s <listening port>\n", argv[0]);

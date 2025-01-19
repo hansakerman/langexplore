@@ -18,7 +18,6 @@ int main()
   struct sockaddr_in srv,cli;
   char buf[512];
   char *data;
-  int n;
   
   addrlen = 0;
   memset(&srv, 0, sizeof(srv));
@@ -60,12 +59,9 @@ int main()
     }  
 
   printf("Client connected\n");
-  // Read is returning number of bytes read.
-  n = read(c, buf, 511);
+  read(c, buf, 511);
   data = "httpd v1.0\n";
   write(c, data, strlen(data));
-  // 1 is stdout and n is size in bytes.
-  write(1, buf, n);
   close(c);
   close(s);
     
