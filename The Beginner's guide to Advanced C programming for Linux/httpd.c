@@ -1,4 +1,4 @@
-29:20!!
+//  54:15
 
 /* httpd.c */
 
@@ -19,7 +19,7 @@
 /* structures */
 struct sHttpRequest {
   char method[8]; // "verb" example GET
-  car url[128];
+  char url[128];
 };
 typedef struct sHttpRequest httpreq;
   
@@ -91,10 +91,9 @@ httpreq *parse_http(char *str)
   httpreq *req;
   char *p;
   
-  reg = malloc(sizeof(httpreq));
-  memset(&req, 0, sizeof(httpreq));
+  req = malloc(sizeof(httpreq));
 
-  for (p=str; p && *p != ' '; p++);
+  for (p=str; *p && *p != ' '; p++);
   if (*p == ' ')
   *p = 0;
   else
@@ -104,7 +103,10 @@ httpreq *parse_http(char *str)
       return 0;
     }
 
-  // 29:20
+  strncpy(req->method, str, 7);
+  return req;
+}
+
 void cli_conn(int s, int c){
   return;
 }
@@ -115,7 +117,8 @@ int main(int argc, char *argv[])
   int s, c;
   char *port;
   char *template;
-  httpreg *req;
+  httpreq *req;
+  char buff[512];
   
   template =
     "GET /fileboar HTTP/1.1\n"
@@ -125,12 +128,20 @@ int main(int argc, char *argv[])
     "Accept-Language: en-US,en;q=0.5\n"
     "Accept-Encoding: gzip, deflate, br, zstd\n"
     "Connection: keep-alive\n"
-    "\n";
+    "\n", 0x00;
 
-   n = strlen(template);
-  reg = parse_http(template);
-  printf("Method: '%s'\nURL: '%s'\n",
-	 req->method, req-url);
+  memset(buff, 0, 512);
+  strncpy(buff, template, 511);
+  
+  req = parse_http(buff);
+  if (!req)
+    fprintf(stderr, "%s\n", error);
+  else
+    printf("Method: '%s'\nURL: '%s'\n",
+	   req->method, req->url);
+  free(req);
+
+  return 0; // for test=
   
   if (argc < 2)
     {
