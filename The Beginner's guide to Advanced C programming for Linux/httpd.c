@@ -100,14 +100,71 @@ httpreq *parse_http(char *str)
     {
       error = "parse_http() NOSPACE error";
       free(req);
+
+      return 0;
+    }
+  strncpy(req->method, str, 7);
+  
+  for (str=++p; *p && *p != ' '; p++);
+  if (*p == ' ')
+  *p = 0;
+  else
+    {
+      error = "parse_http() 2ND SPACE error";
+      free(req);
+
       return 0;
     }
 
-  strncpy(req->method, str, 7);
+  
+  strncpy(req->url, str, 127);
   return req;
 }
 
+/* return 0 on error, or return the data */
+char *cli_read(int c)
+{
+  static char buf[512];
+
+  memset(buf, 0, 512);
+  if (read(c, buf, 511) < 0)
+    {
+      error = "read() error";
+      return 0;
+    }
+  else
+    return buf;
+}
+
+
+
+
 void cli_conn(int s, int c){
+  httpreq *req;
+  char buf[512];
+  char *p;
+
+  p = cli_read(c);
+  if (!p)
+    {
+      fprintf(stderr, "%s\n", error);
+      close(c);
+
+      return;
+    }
+
+  req = parse_http(p);
+  if (!req)
+    {
+      fprintf(stderr, "%s\n", error);
+      close(c);
+
+      return;
+    }
+  printf("'%s'\n'%s'\n", req->method, req->url);
+  free(req);
+  close(c);
+
   return;
 }
 
@@ -116,32 +173,6 @@ int main(int argc, char *argv[])
 {
   int s, c;
   char *port;
-  char *template;
-  httpreq *req;
-  char buff[512];
-  
-  template =
-    "GET /fileboar HTTP/1.1\n"
-    "Host: 127.0.0.1:8181\n"
-    "User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:134.0) Gecko/20100101 Firefox/134.0\n"
-    "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\n"
-    "Accept-Language: en-US,en;q=0.5\n"
-    "Accept-Encoding: gzip, deflate, br, zstd\n"
-    "Connection: keep-alive\n"
-    "\n", 0x00;
-
-  memset(buff, 0, 512);
-  strncpy(buff, template, 511);
-  
-  req = parse_http(buff);
-  if (!req)
-    fprintf(stderr, "%s\n", error);
-  else
-    printf("Method: '%s'\nURL: '%s'\n",
-	   req->method, req->url);
-  free(req);
-
-  return 0; // for test=
   
   if (argc < 2)
     {
