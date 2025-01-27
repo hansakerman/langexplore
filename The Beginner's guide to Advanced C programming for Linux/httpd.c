@@ -1,4 +1,4 @@
-//  54:15
+// 12:30 fixa headers från en annan fil
 
 /* httpd.c */
 
@@ -136,13 +136,21 @@ char *cli_read(int c)
     return buf;
 }
 
+void http_headers(int c, int code)
+}
 
+// i sockets.c finns headers 12.30 typ
 
+{
+  
 
 void cli_conn(int s, int c){
   httpreq *req;
-  char buf[512];
+  char buf[512]; //needed
   char *p;
+  car *res;
+
+
 
   p = cli_read(c);
   if (!p)
@@ -161,7 +169,20 @@ void cli_conn(int s, int c){
 
       return;
     }
-  printf("'%s'\n'%s'\n", req->method, req->url);
+
+  if ((!strcmp(req->method, "GET")) || (!strcmp(req->url, "/app/webpage")))
+    {
+      res = "<html>Hello world</html>";
+      http_headers(c, 200); /* 200 = everything ok */
+      http_response(c, res);
+      close(c);
+    }
+  else
+    {
+      res = "File not found";
+      http_headers(c, 404); /* 404 = file not found */
+    }
+  
   free(req);
   close(c);
 
