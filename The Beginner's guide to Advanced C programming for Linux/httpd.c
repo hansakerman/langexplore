@@ -136,19 +136,57 @@ char *cli_read(int c)
     return buf;
 }
 
-void http_headers(int c, int code)
+void http_response(int c, char *contenttype, char *data)
+{
+  char buf[512];
+  int n;
+
+  n = strlen(data);
+  memset(buf, 0, 512);
+  snprintf(buf, 511,
+	   "Content-Type: %s\n"
+	   "Content-Length: %d\n"
+	   "\n%s\n",
+	   contenttype, n, data);
+  
+  n = strlen(buf);
+  write(c, buf, n);
+
+  return;
 }
 
-// i sockets.c finns headers 12.30 typ
-
+void http_headers(int c, int code)
 {
+  char buf[512];
+  int n;
   
+  memset(buf, 0, 512);
+  snprintf(buf, 511,
+	   "HTTP/1.0 %d OK\n"
+	   "Server: httpd.c\n"
+	   "Content-Language: en\n"
+	   "Expires: -1\n"
+	   "X-Frame-Options: SAMEORIGIN\n",
+	   code);
 
+  n = strlen(buf);
+  write(c, buf, n);
+
+  return;
+	
+
+
+
+/* X-XSS-Protection: 0 */
+/* X-Frame-Options: SAMEORIGIN */	   
+}
+
+  
 void cli_conn(int s, int c){
   httpreq *req;
   char buf[512]; //needed
   char *p;
-  car *res;
+  char *res;
 
 
 
@@ -170,17 +208,17 @@ void cli_conn(int s, int c){
       return;
     }
 
-  if ((!strcmp(req->method, "GET")) || (!strcmp(req->url, "/app/webpage")))
+  if ((!strcmp(req->method, "GET")) && (!strcmp(req->url, "/app/webpage")))
     {
       res = "<html>Hello world</html>";
       http_headers(c, 200); /* 200 = everything ok */
-      http_response(c, res);
-      close(c);
+      http_response(c, "text/html", res);
     }
   else
     {
       res = "File not found";
       http_headers(c, 404); /* 404 = file not found */
+      http_response(c, "text/plain", res);
     }
   
   free(req);
